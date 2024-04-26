@@ -42,23 +42,12 @@ cp "$HOME/dotfiles/git/config" "$HOME/.gitconfig"
 sudo add-apt-repository -y universe multiverse restricted
 sudo apt update
 
-# Add Docker repo
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# shellcheck source=/dev/null
-sudo tee /etc/apt/sources.list.d/docker.list >/dev/null <<EOF
-deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-$(. /etc/os-release && echo "$VERSION_CODENAME") stable
-EOF
-sudo apt update
-
-# Install packages from repo
+# Install packages from distro repo
 # shellcheck disable=SC2046
 sudo apt install -y $(cat ./pkg.add)
 
 # Build and install Neovim
+sudo apt install -y build-essential cmake curl gettext ninja-build unzip
 OGPWD=$(pwd)
 mkdir -p "$HOME/code"
 cd "$HOME/code" || return
@@ -78,3 +67,16 @@ curl -sS https://webi.sh/webi | sh
 git clone --depth=1 https://github.com/tfutils/tfenv.git "$HOME/.tfenv"
 "$HOME/.tfenv/bin/tfenv" install latest
 "$HOME/.tfenv/bin/tfenv" use latest
+
+# Add Docker repo and install Docker packages
+sudo apt remove -y docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+# shellcheck source=/dev/null
+sudo tee /etc/apt/sources.list.d/docker.list >/dev/null <<EOF
+deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+$(. /etc/os-release && echo "$VERSION_CODENAME") stable
+EOF
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
