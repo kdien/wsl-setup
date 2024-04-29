@@ -79,6 +79,9 @@ $(. /etc/os-release && echo "$VERSION_CODENAME") stable
 EOF
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+grep -q '^docker:' /etc/group || sudo groupadd --system docker
+sudo usermod -aG docker "$USER"
+newgrp docker
 
 # Add GitHub repo and install `gh`
 sudo curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /etc/apt/keyrings/github-cli.gpg
