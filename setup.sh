@@ -13,11 +13,14 @@ export LS_COLORS="ow=01;36;40"
 
 if command -v keychain &>/dev/null; then
   find "$HOME/.ssh" -type f -name 'id_*' -not -name '*.pub' -exec keychain -q --nogui {} \;
+  # shellcheck source=/dev/null
   . "$HOME/.keychain/$HOSTNAME-sh"
 fi
 
 [[ "$PATH" =~ $HOME/.local/bin ]] || export PATH="$HOME/.local/bin:$PATH"
 [[ -f "$HOME/dotfiles/bash/.bash_common" ]] && . "$HOME/dotfiles/bash/.bash_common"
+# shellcheck source=/dev/null
+. <(fzf --bash)
 EOF
 
 # Install required dependencies
@@ -81,7 +84,6 @@ sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 grep -q '^docker:' /etc/group || sudo groupadd --system docker
 sudo usermod -aG docker "$USER"
-newgrp docker
 
 # Add GitHub repo and install `gh`
 sudo curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /etc/apt/keyrings/github-cli.gpg
